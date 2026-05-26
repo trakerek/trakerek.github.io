@@ -101,16 +101,68 @@
         .correct-box { background: #d4edda; color: #155724; display: block !important; }
         .wrong-box { background: #f8d7da; color: #721c24; display: block !important; }
         .stats { color: #7f8c8d; margin-bottom: 10px; font-weight: bold; font-size: 1.1em; }
+        #dobraodpplus, #dobraodpminus{
+            background-color: rgba(255, 127, 127, 1.0);
+            font-size: large;
+        }
+        #zlaodpplus, #zlaodpminus{
+            font-size: large;
+            background-color: rgba(127,255,127,1.0);
+
+        }
     </style>
 </head>
 <body>
 
 <div class="select-container">
+<p>
+    <button id="dobraodpminus">-</button>
+    <span id="dobraodp">0</span>
+    <button id="dobraodpplus">+</button>
+</p>
+
+<p>
+    <button id="zlaodpminus">-</button>
+    <span id="zlaodp">0</span>
+    <button id="zlaodpplus">+</button>
+</p>
+
+<script>
+    // Funkcja uniwersalna do obsługi licznika
+    function ustawLicznik(idPrzyciskMinus, idPrzyciskPlus, idTekstLicznik) {
+        const btnMinus = document.getElementById(idPrzyciskMinus);
+        const btnPlus = document.getElementById(idPrzyciskPlus);
+        const tekstLicznik = document.getElementById(idTekstLicznik);
+        
+        let stanLicznika = 0;
+
+        // Obsługa kliknięcia w minus
+        btnMinus.addEventListener('click', () => {
+            stanLicznika--;
+            tekstLicznik.textContent = stanLicznika;
+        });
+
+        // Obsługa kliknięcia w plus
+        btnPlus.addEventListener('click', () => {
+            stanLicznika++;
+            tekstLicznik.textContent = stanLicznika;
+        });
+    }
+
+    // Uruchomienie funkcji dla obu par przycisków po załadowaniu strony
+    document.addEventListener('DOMContentLoaded', () => {
+        ustawLicznik('dobraodpminus', 'dobraodpplus', 'dobraodp');
+        ustawLicznik('zlaodpminus', 'zlaodpplus', 'zlaodp');
+    });
+</script>
     <label for="examSelect" style="font-weight: bold; font-size: 16px;">Wybierz egzamin:</label>
     <select id="examSelect" onchange="changeExam()">
-        <option value="exam1">Egzamin ZD1 (Pytania 1-40)</option>
+        <option value="exam1">Egzamin ZD1 (Pytania 01-40)</option>
         <option value="exam2">Egzamin ZD2 (Pytania 1-40)</option>
         <option value="exam3">Egzamin ZD3 (Pytania 1-40)</option>
+        <option value="exam4">Egzamin ZD4 (Pytania 1-40)</option>
+        <option value="exam5">Egzamin ZD5 (Pytania 1-40)</option>
+        <option value="exam6">Egzamin ZD6 (Pytania 1-40)</option>
     </select>
     <button class="btn-random" id="modeLabel" onclick="toggleRandom()">Tryb: Kolejno</button>
 </div>
@@ -136,6 +188,7 @@
 </div>
 
 <script>
+    // Pełna baza 3 egzaminów z poprawnym mapowaniem ścieżek i kluczy odpowiedzi
     const exams = {
         exam1: {
             name: "Egzamin ZD1",
@@ -146,10 +199,10 @@
                 "ZD1-4/31.png", "ZD1-4/32.png", "ZD1-4/33.png", "ZD1-4/34.png", "ZD1-4/35.png", "ZD1-4/36.png", "ZD1-4/37.png", "ZD1-4/38.png", "ZD1-4/39.png", "ZD1-4/40.png"
             ],
             answers: {
-                "ZD1/01.png": "A", "ZD1/02.png": "B", "ZD1/03.png": "D", "ZD1/04.png": "C", "ZD1/05.png": "B", "ZD1/06.png": "A", "ZD1/07.png": "C", "ZD1/08.png": "A", "ZD1/09.png": "D", "ZD1/10.png": "B",
-                "ZD1-2/11.png": "C", "ZD1-2/12.png": "A", "ZD1-2/13.png": "D", "ZD1-2/14.png": "B", "ZD1-2/15.png": "C", "ZD1-2/16.png": "A", "ZD1-2/17.png": "D", "ZD1-2/18.png": "B", "ZD1-2/19.png": "C",
-                "ZD1-3/21.png": "A", "ZD1-3/22.png": "D", "ZD1-3/23.png": "C", "ZD1-3/24.png": "B", "ZD1-3/25.png": "A", "ZD1-3/26.png": "C", "ZD1-3/27.png": "D", "ZD1-3/28.png": "C", "ZD1-3/29.png": "B", "ZD1-3/30.png": "A",
-                "ZD1-4/31.png": "C", "ZD1-4/32.png": "D", "ZD1-4/33.png": "C", "ZD1-4/34.png": "B", "ZD1-4/35.png": "A", "ZD1-4/36.png": "B", "ZD1-4/37.png": "D", "ZD1-4/38.png": "C", "ZD1-4/39.png": "A", "ZD1-4/40.png": "B"
+                "ZD1/01.png": "D", "ZD1/02.png": "C", "ZD1/03.png": "C", "ZD1/04.png": "A", "ZD1/05.png": "D", "ZD1/06.png": "B", "ZD1/07.png": "B", "ZD1/08.png": "A", "ZD1/09.png": "D", "ZD1/10.png": "B",
+                "ZD1-2/11.png": "C", "ZD1-2/12.png": "D", "ZD1-2/13.png": "A", "ZD1-2/14.png": "D", "ZD1-2/15.png": "C", "ZD1-2/16.png": "B", "ZD1-2/17.png": "D", "ZD1-2/18.png": "B", "ZD1-2/19.png": "D",
+                "ZD1-3/21.png": "C", "ZD1-3/22.png": "D", "ZD1-3/23.png": "C", "ZD1-3/24.png": "D", "ZD1-3/25.png": "D", "ZD1-3/26.png": "A", "ZD1-3/27.png": "D", "ZD1-3/28.png": "A", "ZD1-3/29.png": "A", "ZD1-3/30.png": "A",
+                "ZD1-4/31.png": "A", "ZD1-4/32.png": "A", "ZD1-4/33.png": "B", "ZD1-4/34.png": "D", "ZD1-4/35.png": "D", "ZD1-4/36.png": "D", "ZD1-4/37.png": "D", "ZD1-4/38.png": "B", "ZD1-4/39.png": "B", "ZD1-4/40.png": "C"
             }
         },
         exam2: {
@@ -180,6 +233,52 @@
                 "ZD-3-2/P11.png": "A", "ZD-3-2/P12.png": "C", "ZD-3-2/P13.png": "A", "ZD-3-2/P14.png": "D", "ZD-3-2/p15.png": "C", "ZD-3-2/p16.png": "D", "ZD-3-2/p17.png": "D", "ZD-3-2/p18.png": "B", "ZD-3-2/p19.png": "A", "ZD-3-2/p20.png": "B",
                 "ZD-3-3/p21.png": "A", "ZD-3-3/p22.png": "A", "ZD-3-3/p23.png": "D", "ZD-3-3/p24.png": "B", "ZD-3-3/p25.png": "B", "ZD-3-3/p26.png": "D", "ZD-3-3/p27.png": "B", "ZD-3-3/p28.png": "B", "ZD-3-3/p29.png": "D", "ZD-3-3/p30.png": "C",
                 "ZD-3-4/p31.png": "A", "ZD-3-4/p32.png": "A", "ZD-3-4/p33.png": "B", "ZD-3-4/p34.png": "B", "ZD-3-4/p35.png": "A", "ZD-3-4/p37.png": "D", "ZD-3-4/p38.png": "A", "ZD-3-4/p39.png": "B", "ZD-3-4/p40.png": "C"
+            }
+        }
+        ,
+        exam4: {
+            name: "Egzamin ZD4",
+            questions: [
+                "ZD4/pyt1.jpg","ZD4/pyt2.jpg","ZD4/pyt3.jpg","ZD4/pyt4.jpg","ZD4/pyt5.jpg","ZD4/pyt6.jpg","ZD4/pyt7.jpg","ZD4/pyt8.jpg","ZD4/pyt9.jpg","ZD4/pyt10.jpg",
+                "ZD4-2/pyt11.jpg","ZD4-2/pyt12.jpg","ZD4-2/pyt13.jpg","ZD4-2/pyt14.jpg","ZD4-2/pyt15.jpg","ZD4-2/pyt16.jpg","ZD4-2/pyt17.jpg","ZD4-2/pyt18.jpg","ZD4-2/pyt19.jpg","ZD4-2/pyt20.jpg",
+                "ZD4-3/pyt21.jpg","ZD4-3/pyt22.jpg","ZD4-3/pyt23.jpg","ZD4-3/pyt24.jpg","ZD4-3/pyt25.jpg","ZD4-3/pyt26.jpg","ZD4-3/pyt27.jpg","ZD4-3/pyt28.jpg","ZD4-3/pyt29.jpg","ZD4-3/pyt30.jpg",
+                "ZD4-4/pyt31.jpg","ZD4-4/pyt32.jpg","ZD4-4/pyt33.jpg","ZD4-4/pyt34.jpg","ZD4-4/pyt35.jpg","ZD4-4/pyt36.jpg","ZD4-4/pyt37.jpg","ZD4-4/pyt38.jpg","ZD4-4/pyt39.jpg","ZD4-4/pyt40.jpg"
+            ],
+            answers: {
+                "ZD4/pyt1.jpg":"A","ZD4/pyt2.jpg":"D","ZD4/pyt3.jpg":"A","ZD4/pyt4.jpg":"A","ZD4/pyt5.jpg":"A","ZD4/pyt6.jpg":"B","ZD4/pyt7.jpg":"B","ZD4/pyt8.jpg":"D","ZD4/pyt9.jpg":"D","ZD4/pyt10.jpg":"B",
+                "ZD4-2/pyt11.jpg":"C","ZD4-2/pyt12.jpg":"C","ZD4-2/pyt13.jpg":"C","ZD4-2/pyt14.jpg":"B","ZD4-2/pyt15.jpg":"B","ZD4-2/pyt16.jpg":"A","ZD4-2/pyt17.jpg":"D","ZD4-2/pyt18.jpg":"B","ZD4-2/pyt19.jpg":"C","ZD4-2/pyt20.jpg":"D",
+                "ZD4-3/pyt21.jpg":"B","ZD4-3/pyt22.jpg":"D","ZD4-3/pyt23.jpg":"A","ZD4-3/pyt24.jpg":"D","ZD4-3/pyt25.jpg":"D","ZD4-3/pyt26.jpg":"A","ZD4-3/pyt27.jpg":"D","ZD4-3/pyt28.jpg":"A","ZD4-3/pyt29.jpg":"B","ZD4-3/pyt30.jpg":"B",
+                "ZD4-4/pyt31.jpg":"B","ZD4-4/pyt32.jpg":"C","ZD4-4/pyt33.jpg":"D","ZD4-4/pyt34.jpg":"B","ZD4-4/pyt35.jpg":"C","ZD4-4/pyt36.jpg":"B","ZD4-4/pyt37.jpg":"C","ZD4-4/pyt38.jpg":"A","ZD4-4/pyt39.jpg":"C","ZD4-4/pyt40.jpg":"D"
+            }
+        },
+        exam5: {
+            name: "Egzamin ZD5",
+            questions: [
+                "ZD5/P1.jpg","ZD5/P2.jpg","ZD5/P3.jpg","ZD5/P4.jpg","ZD5/P5.jpg","ZD5/P6.jpg","ZD5/P7.jpg","ZD5/P8.jpg","ZD5/P9.jpg","ZD5/P10.jpg",
+                "ZD5-2/P11.jpg","ZD5-2/P12.jpg","ZD5-2/P13.jpg","ZD5-2/P14.jpg","ZD5-2/P15.jpg","ZD5-2/P16.jpg","ZD5-2/P17.jpg","ZD5-2/P18.jpg","ZD5-2/P19.jpg","ZD5-2/P20.jpg",
+                "ZD5-3/P21.jpg","ZD5-3/P22.jpg","ZD5-3/P23.jpg","ZD5-3/P24.jpg","ZD5-3/P25.jpg","ZD5-3/P26.jpg","ZD5-3/P27.jpg","ZD5-3/P28.jpg","ZD5-3/P29.jpg","ZD5-3/P30.jpg",
+                "ZD5-4/P31.jpg","ZD5-4/P32.jpg","ZD5-4/P33.jpg","ZD5-4/P34.jpg","ZD5-4/P35.jpg","ZD5-4/P36.jpg","ZD5-4/P37.jpg","ZD5-4/P38.jpg","ZD5-4/P40.jpg"
+            ],
+            answers: {
+                "ZD5/P1.jpg":"B","ZD5/P2.jpg":"D","ZD5/P3.jpg":"A","ZD5/P4.jpg":"D","ZD5/P5.jpg":"B","ZD5/P6.jpg":"B","ZD5/P7.jpg":"D","ZD5/P8.jpg":"C","ZD5/P9.jpg":"A","ZD5/P10.jpg":"A",
+                "ZD5-2/P11.jpg":"B","ZD5-2/P12.jpg":"D","ZD5-2/P13.jpg":"C","ZD5-2/P14.jpg":"B","ZD5-2/P15.jpg":"C","ZD5-2/P16.jpg":"B","ZD5-2/P17.jpg":"A","ZD5-2/P18.jpg":"D","ZD5-2/P19.jpg":"B","ZD5-2/P20.jpg":"B",
+                "ZD5-3/P21.jpg":"C","ZD5-3/P22.jpg":"D","ZD5-3/P23.jpg":"B","ZD5-3/P24.jpg":"B","ZD5-3/P25.jpg":"C","ZD5-3/P26.jpg":"D","ZD5-3/P27.jpg":"A","ZD5-3/P28.jpg":"A","ZD5-3/P29.jpg":"D","ZD5-3/P30.jpg":"C",
+                "ZD5-4/P31.jpg":"D","ZD5-4/P32.jpg":"D","ZD5-4/P33.jpg":"C","ZD5-4/P34.jpg":"C","ZD5-4/P35.jpg":"B","ZD5-4/P36.jpg":"C","ZD5-4/P37.jpg":"A","ZD5-4/P38.jpg":"A","ZD5-4/P40.jpg":"B"
+            }
+        },
+        exam6: {
+            name: "Egzamin ZD6",
+            questions: [
+                "ZD6/Pyt. 1.jpg","ZD6/Pyt. 2.jpg","ZD6/Pyt. 3.jpg","ZD6/Pyt. 4.jpg","ZD6/Pyt. 5.jpg","ZD6/Pyt. 6.jpg","ZD6/Pyt. 7.jpg","ZD6/Pyt. 8.jpg","ZD6/Pyt. 9.jpg","ZD6/Pyt. 10.jpg",
+                "ZD6-2/Pyt. 11.jpg","ZD6-2/Pyt. 12.jpg","ZD6-2/Pyt. 13.jpg","ZD6-2/Pyt. 14.jpg","ZD6-2/Pyt. 15.jpg","ZD6-2/Pyt. 16.jpg","ZD6-2/Pyt. 17.jpg","ZD6-2/Pyt. 18.jpg","ZD6-2/Pyt. 19.jpg","ZD6-2/Pyt. 20.jpg",
+                "ZD6-3/Pyt. 21.jpg","ZD6-3/Pyt. 22.jpg","ZD6-3/Pyt. 23.jpg","ZD6-3/Pyt. 24.jpg","ZD6-3/Pyt. 25.jpg","ZD6-3/Pyt. 26.jpg","ZD6-3/Pyt. 28.jpg","ZD6-3/Pyt. 29.jpg","ZD6-3/Pyt. 30.jpg",
+                "ZD6-4/Pyt. 31.jpg","ZD6-4/Pyt. 32.jpg","ZD6-4/Pyt. 33.jpg","ZD6-4/Pyt. 34.jpg","ZD6-4/Pyt. 35.jpg","ZD6-4/Pyt. 36.jpg","ZD6-4/Pyt. 37.jpg","ZD6-4/Pyt. 38.jpg","ZD6-4/Pyt. 39.jpg","ZD6-4/Pyt. 40.jpg"
+            ],
+            answers: {
+                "ZD6/Pyt. 1.jpg":"B","ZD6/Pyt. 2.jpg":"B","ZD6/Pyt. 3.jpg":"A","ZD6/Pyt. 4.jpg":"D","ZD6/Pyt. 5.jpg":"C","ZD6/Pyt. 6.jpg":"A","ZD6/Pyt. 7.jpg":"A","ZD6/Pyt. 8.jpg":"A","ZD6/Pyt. 9.jpg":"A","ZD6/Pyt. 10.jpg":"C",
+                "ZD6-2/Pyt. 11.jpg":"B","ZD6-2/Pyt. 12.jpg":"D","ZD6-2/Pyt. 13.jpg":"A","ZD6-2/Pyt. 14.jpg":"A","ZD6-2/Pyt. 15.jpg":"D","ZD6-2/Pyt. 16.jpg":"C","ZD6-2/Pyt. 17.jpg":"D","ZD6-2/Pyt. 18.jpg":"B","ZD6-2/Pyt. 19.jpg":"D","ZD6-2/Pyt. 20.jpg":"B",
+                "ZD6-3/Pyt. 21.jpg":"D","ZD6-3/Pyt. 22.jpg":"C","ZD6-3/Pyt. 23.jpg":"C","ZD6-3/Pyt. 24.jpg":"B","ZD6-3/Pyt. 25.jpg":"C","ZD6-3/Pyt. 26.jpg":"A","ZD6-3/Pyt. 28.jpg":"B","ZD6-3/Pyt. 29.jpg":"A","ZD6-3/Pyt. 30.jpg":"D",
+                "ZD6-4/Pyt. 31.jpg":"C","ZD6-4/Pyt. 32.jpg":"C","ZD6-4/Pyt. 33.jpg":"D","ZD6-4/Pyt. 34.jpg":"A","ZD6-4/Pyt. 35.jpg":"D","ZD6-4/Pyt. 36.jpg":"D","ZD6-4/Pyt. 37.jpg":"B","ZD6-4/Pyt. 38.jpg":"B","ZD6-4/Pyt. 39.jpg":"A","ZD6-4/Pyt. 40.jpg":"C"
             }
         }
     };
@@ -257,10 +356,25 @@
     }
 
     function nextQ() {
-        const exam = exams[currentExamKey];
         if (isRandom) {
+            // 1. Pobierz tablicę zawierającą klucze wszystkich egzaminów (np. ["exam1", "exam2", ...])
+            const examKeys = Object.keys(exams);
+            
+            // 2. Wylosuj jeden z egzaminów
+            const randomExamKey = examKeys[Math.floor(Math.random() * examKeys.length)];
+            
+            // 3. Ustaw wylosowany egzamin jako aktywny
+            currentExamKey = randomExamKey;
+            
+            // 4. Zaktualizuj wizualnie listę rozwijaną (select) na stronie
+            document.getElementById('examSelect').value = randomExamKey;
+            
+            // 5. Wylosuj indeks pytania z wybranego egzaminu
+            const exam = exams[currentExamKey];
             currentIndex = Math.floor(Math.random() * exam.questions.length);
         } else {
+            // Klasyczne przechodzenie kolejno w obrębie jednego egzaminu
+            const exam = exams[currentExamKey];
             currentIndex = (currentIndex + 1) % exam.questions.length;
         }
         loadQuestion();
