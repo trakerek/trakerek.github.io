@@ -29,6 +29,13 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .scoreboard {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
         .select-container {
             margin-bottom: 20px;
             width: 100%;
@@ -87,7 +94,6 @@
         .action-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
         button { padding: 12px 25px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; }
         
-        .btn-check { background: var(--success); color: white; width: 100%; font-size: 1.1em; }
         .btn-nav { background: #95a5a6; color: white; }
         .btn-random { background: #f39c12; color: white; }
 
@@ -97,6 +103,11 @@
             border-radius: 5px;
             display: none;
             font-weight: bold;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+        #feedback.fade-out {
+            opacity: 0;
         }
         .correct-box { background: #d4edda; color: #155724; display: block !important; }
         .wrong-box { background: #f8d7da; color: #721c24; display: block !important; }
@@ -105,8 +116,14 @@
             display: inline-flex;
             gap: 8px;
             align-items: center;
-            font-weight: bold;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #e3e6ea;
+            background: #f7f9fb;
         }
+        .score-label { font-size: 0.95em; opacity: 0.85; }
+        .score-value { font-size: 1.05em; }
         #dobraodp { color: var(--success); }
         #zlaodp { color: var(--error); }
 
@@ -147,6 +164,11 @@
             border-color: #7f9cf5;
             color: #fff;
         }
+        body.dark-mode .score {
+            border-color: #2a2a4a;
+            background: #1f2a44;
+        }
+        body.dark-mode .score-label { opacity: 0.95; }
         body.dark-mode .stats {
             color: #aaa;
         }
@@ -167,6 +189,9 @@
         }
         body.dark-mode #dobraodp { color: #7fffb0; }
         body.dark-mode #zlaodp { color: #ffaaaa; }
+        body.dark-mode .question-img {
+            filter: invert(1) hue-rotate(180deg);
+        }
 
         /* Theme toggle button */
         #themeToggle {
@@ -200,15 +225,17 @@
 <body>
 
 <div class="select-container">
-<p class="score">
-    Poprawne:
-    <span id="dobraodp">0</span>
-</p>
+<div class="scoreboard">
+    <p class="score">
+        <span class="score-label">Poprawne</span>
+        <span class="score-value" id="dobraodp">0</span>
+    </p>
 
-<p class="score">
-    Bledne:
-    <span id="zlaodp">0</span>
-</p>
+    <p class="score">
+        <span class="score-label">Bledne</span>
+        <span class="score-value" id="zlaodp">0</span>
+    </p>
+</div>
     <label for="examSelect" style="font-weight: bold; font-size: 16px;">Wybierz egzamin:</label>
     <select id="examSelect" onchange="changeExam()">
         <option value="exam1">Egzamin ZD1 (Pytania 01-40)</option>
@@ -233,7 +260,6 @@
         <button class="option-btn" id="btnD" onclick="selectOption('D')">D</button>
     </div>
 
-    <button class="btn-check" onclick="checkAnswer()">SPRAWDŹ ODPOWIEDŹ</button>
     <div id="feedback"></div>
 
     <div class="action-btns">
@@ -440,6 +466,8 @@
             wrongCount += 1;
         }
 
+        feedback.classList.remove('fade-out');
+
         renderScore();
 
         const isLastQuestion = !isRandom && currentIndex === exam.questions.length - 1;
@@ -450,6 +478,14 @@
             feedback.className = "correct-box";
             return;
         }
+
+        // Powolne znikanie informacji zwrotnej
+        setTimeout(() => {
+            feedback.classList.add('fade-out');
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 900);
+        }, 1200);
 
         // Po krótkim czasie przejdź do następnego pytania, aby UX był płynniejszy
         setTimeout(() => {
