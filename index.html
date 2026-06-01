@@ -228,19 +228,24 @@
         const btnMinus = document.getElementById(idPrzyciskMinus);
         const btnPlus = document.getElementById(idPrzyciskPlus);
         const tekstLicznik = document.getElementById(idTekstLicznik);
-        
-        let stanLicznika = 0;
+        // Use DOM text as single source of truth so external updates stay in sync
+        function read() {
+            return parseInt(tekstLicznik.textContent, 10) || 0;
+        }
+        function write(v) {
+            tekstLicznik.textContent = v;
+        }
 
         // Obsługa kliknięcia w minus
         btnMinus.addEventListener('click', () => {
-            stanLicznika--;
-            tekstLicznik.textContent = stanLicznika;
+            const v = read() - 1;
+            write(v);
         });
 
         // Obsługa kliknięcia w plus
         btnPlus.addEventListener('click', () => {
-            stanLicznika++;
-            tekstLicznik.textContent = stanLicznika;
+            const v = read() + 1;
+            write(v);
         });
     }
 
@@ -417,8 +422,12 @@
         selectedAns = val;
         document.querySelectorAll('.option-btn').forEach(btn => {
             btn.classList.remove('selected');
-            if(btn.innerText === val) btn.classList.add('selected');
+            if (btn.innerText === val) btn.classList.add('selected');
         });
+
+        // Automatycznie sprawdź odpowiedź po wyborze
+        // Krótka przerwa, aby użytkownik zobaczył zaznaczenie
+        setTimeout(() => checkAnswer(), 150);
     }
 
     function checkAnswer() {
@@ -427,7 +436,6 @@
             alert("Najpierw wybierz odpowiedź!");
             return;
         }
-        
         answered = true;
         const exam = exams[currentExamKey];
         const currentPath = exam.questions[currentIndex];
@@ -445,10 +453,24 @@
         if (selectedAns === correct) {
             feedback.innerText = "BRAWO! To poprawna odpowiedź.";
             feedback.className = "correct-box";
+            // Zwiększ licznik poprawnych odpowiedzi
+            const el = document.getElementById('dobraodp');
+            const v = parseInt(el.textContent, 10) || 0;
+            el.textContent = v + 1;
         } else {
             feedback.innerText = `BŁĄD. Poprawna odpowiedź to: ${correct}`;
             feedback.className = "wrong-box";
+            // Zwiększ licznik złych odpowiedzi
+            const el2 = document.getElementById('zlaodp');
+            const v2 = parseInt(el2.textContent, 10) || 0;
+            el2.textContent = v2 + 1;
         }
+
+        // Po krótkim czasie przejdź do następnego pytania, aby UX był płynniejszy
+        setTimeout(() => {
+            // Jeśli użytkownik preferuje przechodzenie kolejno, po sprawdzeniu przejdź dalej
+            nextQ();
+        }, 900);
     }
 
     function nextQ() {
@@ -487,8 +509,24 @@
         document.getElementById('modeLabel').innerText = isRandom ? "Tryb: Losowy" : "Tryb: Kolejno";
     }
 
-    // Pierwsze uruchomienie aplikacji
-    window.onload = initExam;
+    // Pierwsze uruchomienie aplikacji i dodatkowe skróty/nawigacja
+    window.onload = function() {
+        initExam();
+
+        // Kliknięcie obrazu przechodzi do następnego pytania
+        const img = document.getElementById('qImg');
+        if (img) {
+            img.style.cursor = 'pointer';
+            img.title = 'Kliknij, aby przejść do następnego pytania';
+            img.addEventListener('click', () => nextQ());
+        }
+
+        // Nawigacja klawiaturą: lewo/prawo
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextQ();
+            if (e.key === 'ArrowLeft') prevQ();
+        });
+    };
 </script>
 
 
