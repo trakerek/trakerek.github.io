@@ -29,6 +29,13 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .scoreboard {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
         .select-container {
             margin-bottom: 20px;
             width: 100%;
@@ -87,7 +94,6 @@
         .action-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
         button { padding: 12px 25px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; }
         
-        .btn-check { background: var(--success); color: white; width: 100%; font-size: 1.1em; }
         .btn-nav { background: #95a5a6; color: white; }
         .btn-random { background: #f39c12; color: white; }
 
@@ -97,19 +103,29 @@
             border-radius: 5px;
             display: none;
             font-weight: bold;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+        #feedback.fade-out {
+            opacity: 0;
         }
         .correct-box { background: #d4edda; color: #155724; display: block !important; }
         .wrong-box { background: #f8d7da; color: #721c24; display: block !important; }
         .stats { color: #7f8c8d; margin-bottom: 10px; font-weight: bold; font-size: 1.1em; }
-        #dobraodpplus, #dobraodpminus{
-            background-color: rgba(255, 127, 127, 1.0);
-            font-size: large;
+        .score {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #e3e6ea;
+            background: #f7f9fb;
         }
-        #zlaodpplus, #zlaodpminus{
-            font-size: large;
-            background-color: rgba(127,255,127,1.0);
-
-        }
+        .score-label { font-size: 0.95em; opacity: 0.85; }
+        .score-value { font-size: 1.05em; }
+        #dobraodp { color: var(--success); }
+        #zlaodp { color: var(--error); }
 
         /* ===== DARK MODE ===== */
         body.dark-mode {
@@ -148,6 +164,11 @@
             border-color: #7f9cf5;
             color: #fff;
         }
+        body.dark-mode .score {
+            border-color: #2a2a4a;
+            background: #1f2a44;
+        }
+        body.dark-mode .score-label { opacity: 0.95; }
         body.dark-mode .stats {
             color: #aaa;
         }
@@ -166,16 +187,10 @@
         body.dark-mode label {
             color: #e0e0e0;
         }
-        body.dark-mode #dobraodpplus, body.dark-mode #dobraodpminus {
-            background-color: rgba(200, 80, 80, 0.85);
-            color: #fff;
-        }
-        body.dark-mode #zlaodpplus, body.dark-mode #zlaodpminus {
-            background-color: rgba(60, 160, 60, 0.85);
-            color: #fff;
-        }
-        body.dark-mode span#dobraodp, body.dark-mode span#zlaodp {
-            color: #e0e0e0;
+        body.dark-mode #dobraodp { color: #7fffb0; }
+        body.dark-mode #zlaodp { color: #ffaaaa; }
+        body.dark-mode .question-img {
+            filter: invert(1) hue-rotate(180deg);
         }
 
         /* Theme toggle button */
@@ -210,46 +225,17 @@
 <body>
 
 <div class="select-container">
-<p>
-    <button id="dobraodpminus">-</button>
-    <span id="dobraodp">0</span>
-    <button id="dobraodpplus">+</button>
-</p>
+<div class="scoreboard">
+    <p class="score">
+        <span class="score-label">Poprawne</span>
+        <span class="score-value" id="dobraodp">0</span>
+    </p>
 
-<p>
-    <button id="zlaodpminus">-</button>
-    <span id="zlaodp">0</span>
-    <button id="zlaodpplus">+</button>
-</p>
-
-<script>
-    // Funkcja uniwersalna do obsługi licznika
-    function ustawLicznik(idPrzyciskMinus, idPrzyciskPlus, idTekstLicznik) {
-        const btnMinus = document.getElementById(idPrzyciskMinus);
-        const btnPlus = document.getElementById(idPrzyciskPlus);
-        const tekstLicznik = document.getElementById(idTekstLicznik);
-        
-        let stanLicznika = 0;
-
-        // Obsługa kliknięcia w minus
-        btnMinus.addEventListener('click', () => {
-            stanLicznika--;
-            tekstLicznik.textContent = stanLicznika;
-        });
-
-        // Obsługa kliknięcia w plus
-        btnPlus.addEventListener('click', () => {
-            stanLicznika++;
-            tekstLicznik.textContent = stanLicznika;
-        });
-    }
-
-    // Uruchomienie funkcji dla obu par przycisków po załadowaniu strony
-    document.addEventListener('DOMContentLoaded', () => {
-        ustawLicznik('dobraodpminus', 'dobraodpplus', 'dobraodp');
-        ustawLicznik('zlaodpminus', 'zlaodpplus', 'zlaodp');
-    });
-</script>
+    <p class="score">
+        <span class="score-label">Bledne</span>
+        <span class="score-value" id="zlaodp">0</span>
+    </p>
+</div>
     <label for="examSelect" style="font-weight: bold; font-size: 16px;">Wybierz egzamin:</label>
     <select id="examSelect" onchange="changeExam()">
         <option value="exam1">Egzamin ZD1 (Pytania 01-40)</option>
@@ -274,7 +260,6 @@
         <button class="option-btn" id="btnD" onclick="selectOption('D')">D</button>
     </div>
 
-    <button class="btn-check" onclick="checkAnswer()">SPRAWDŹ ODPOWIEDŹ</button>
     <div id="feedback"></div>
 
     <div class="action-btns">
@@ -384,9 +369,25 @@
     let selectedAns = null;
     let isRandom = false;
     let answered = false;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let answerStates = {};
+
+    function renderScore() {
+        document.getElementById('dobraodp').textContent = correctCount;
+        document.getElementById('zlaodp').textContent = wrongCount;
+    }
+
+    function resetScore() {
+        correctCount = 0;
+        wrongCount = 0;
+        answerStates = {};
+        renderScore();
+    }
 
     function initExam() {
         currentIndex = 0;
+        resetScore();
         loadQuestion();
     }
 
@@ -417,8 +418,12 @@
         selectedAns = val;
         document.querySelectorAll('.option-btn').forEach(btn => {
             btn.classList.remove('selected');
-            if(btn.innerText === val) btn.classList.add('selected');
+            if (btn.innerText === val) btn.classList.add('selected');
         });
+
+        // Automatycznie sprawdź odpowiedź po wyborze
+        // Krótka przerwa, aby użytkownik zobaczył zaznaczenie
+        setTimeout(() => checkAnswer(), 150);
     }
 
     function checkAnswer() {
@@ -427,12 +432,12 @@
             alert("Najpierw wybierz odpowiedź!");
             return;
         }
-        
         answered = true;
         const exam = exams[currentExamKey];
         const currentPath = exam.questions[currentIndex];
         const correct = exam.answers[currentPath];
         const feedback = document.getElementById('feedback');
+        const wasCorrect = answerStates[currentPath];
         
         document.querySelectorAll('.option-btn').forEach(btn => {
             btn.classList.remove('selected');
@@ -442,13 +447,51 @@
             if (btn.innerText === selectedAns && selectedAns !== correct) btn.classList.add('wrong-show');
         });
 
-        if (selectedAns === correct) {
+        if (wasCorrect === true) {
+            correctCount -= 1;
+        } else if (wasCorrect === false) {
+            wrongCount -= 1;
+        }
+
+        const isCorrect = selectedAns === correct;
+        answerStates[currentPath] = isCorrect;
+
+        if (isCorrect) {
             feedback.innerText = "BRAWO! To poprawna odpowiedź.";
             feedback.className = "correct-box";
+            correctCount += 1;
         } else {
             feedback.innerText = `BŁĄD. Poprawna odpowiedź to: ${correct}`;
             feedback.className = "wrong-box";
+            wrongCount += 1;
         }
+
+        feedback.classList.remove('fade-out');
+
+        renderScore();
+
+        const isLastQuestion = !isRandom && currentIndex === exam.questions.length - 1;
+        if (isLastQuestion) {
+            const total = exam.questions.length;
+            const percent = Math.round((correctCount / total) * 100);
+            feedback.innerText = `KONIEC EGZAMINU. Wynik: ${percent}% (${correctCount}/${total})`;
+            feedback.className = "correct-box";
+            return;
+        }
+
+        // Powolne znikanie informacji zwrotnej
+        setTimeout(() => {
+            feedback.classList.add('fade-out');
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 900);
+        }, 1200);
+
+        // Po krótkim czasie przejdź do następnego pytania, aby UX był płynniejszy
+        setTimeout(() => {
+            // Jeśli użytkownik preferuje przechodzenie kolejno, po sprawdzeniu przejdź dalej
+            nextQ();
+        }, 900);
     }
 
     function nextQ() {
@@ -487,8 +530,24 @@
         document.getElementById('modeLabel').innerText = isRandom ? "Tryb: Losowy" : "Tryb: Kolejno";
     }
 
-    // Pierwsze uruchomienie aplikacji
-    window.onload = initExam;
+    // Pierwsze uruchomienie aplikacji i dodatkowe skróty/nawigacja
+    window.onload = function() {
+        initExam();
+
+        // Kliknięcie obrazu przechodzi do następnego pytania
+        const img = document.getElementById('qImg');
+        if (img) {
+            img.style.cursor = 'pointer';
+            img.title = 'Kliknij, aby przejść do następnego pytania';
+            img.addEventListener('click', () => nextQ());
+        }
+
+        // Nawigacja klawiaturą: lewo/prawo
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextQ();
+            if (e.key === 'ArrowLeft') prevQ();
+        });
+    };
 </script>
 
 
